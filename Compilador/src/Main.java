@@ -1,62 +1,39 @@
-import java.util.Comparator;
-import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico();
 
         while (true) {
-            System.out.println("\nEscolha o modo de entrada:");
-            System.out.println("1 - Entrada padrão");
-            System.out.println("2 - Digitar entrada");
-            System.out.println("0 - Sair");
+            System.out.println("\n------------------------------------");
+            System.out.print("Digite um comando (ou 'sair'): ");
+            String texto = scanner.nextLine();
 
-            System.out.print("Digite a opção (0/1/2): ");
-            int opcao = scanner.nextInt();
-            scanner.nextLine();
-            System.out.println();
-
-            if (opcao == 0) {
-                System.out.println("Saindo do analisador léxico.");
+            if (texto.equalsIgnoreCase("sair")) {
+                System.out.println("Saindo do programa.");
                 break;
             }
 
-            String texto = "";
-            if (opcao == 1) {
-                texto = "O rato roeu a roupa do Rei de Roma. Três pratos de trigo para três tigres tristes.";
-                        System.out.println(texto);
-                        System.out.println();
-            } else if (opcao == 2) {
-                System.out.println("Digite a entrada: ");
-                texto = scanner.nextLine();
-                System.out.println();
-            } else {
-                System.out.println("Opção inválida.");
+            if (texto.equalsIgnoreCase("tabela")) {
+                analisadorSintatico.imprimirTabelaDeSimbolos();
                 continue;
             }
 
-            AnalisadorLexico analisador = new AnalisadorLexico(texto);
-            List<Token> tabelaDeSimbolos = analisador.analisar();
-            Queue<Token> filaDeTokens = analisador.getFilaDeTokens();
+            AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto);
+            analisadorLexico.analisar();
+            Queue<Token> filaDeTokens = analisadorLexico.getFilaDeTokens();
 
-            tabelaDeSimbolos.sort(Comparator.comparing(Token::getValor, String.CASE_INSENSITIVE_ORDER));
+            System.out.println("Fila de Tokens gerada: "
+                    + filaDeTokens.stream().map(Token::getValor).collect(Collectors.joining(" ")));
 
-            System.out.println("\n--- Tabela de Símbolos ---");
-            for (Token token : tabelaDeSimbolos) {
-                System.out.print(token.getValor() + " ");
-            }
-
-            System.out.println("\n\n--- Fila de Tokens ---");
-            for (Token token : filaDeTokens) {
-                System.out.print(token.getValor() + " ");
-            }
-
-            System.out.println();
+            analisadorSintatico.analisar(filaDeTokens);
         }
 
+        analisadorSintatico.imprimirTabelaDeSimbolos();
         scanner.close();
     }
 }

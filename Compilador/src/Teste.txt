@@ -1,0 +1,138 @@
+----------------------------------------------------
+SUÍTE DE TESTES PARA O RECONHECEDOR
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 1: Pergunta Completa - Formato Simples
+----------------------------------------------------
+COMANDO DE ENTRADA:
+Qual documento está no formato PDF ?
+
+OUTPUT ESPERADO:
+✅ Comando reconhecido com sucesso.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 2: Pergunta Completa - Composta
+----------------------------------------------------
+COMANDO DE ENTRADA:
+Mostre documentos com formato DOCX e tamanho maior que 100 MB ?
+
+OUTPUT ESPERADO:
+✅ Comando reconhecido com sucesso.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 3: Pergunta Completa - Título com Texto Livre
+----------------------------------------------------
+COMANDO DE ENTRADA:
+Existe documento com titulo relatorio de vendas anual ?
+
+OUTPUT ESPERADO:
+✅ Comando reconhecido com sucesso.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 4: Pergunta Completa - Objeto e Título
+----------------------------------------------------
+COMANDO DE ENTRADA:
+Quando foi criado o arquivo com titulo plano de marketing ?
+
+OUTPUT ESPERADO:
+✅ Comando reconhecido com sucesso.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 5: Pergunta Completa - Filtro de Tamanho
+----------------------------------------------------
+COMANDO DE ENTRADA:
+Mostre imagem de tamanho menor que 2 GB ?
+
+OUTPUT ESPERADO:
+✅ Comando reconhecido com sucesso.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 6: Pergunta Completa - Filtro de Data
+----------------------------------------------------
+COMANDO DE ENTRADA:
+Mostre arquivo de data 10 / 08 / 2024 ?
+
+OUTPUT ESPERADO:
+✅ Comando reconhecido com sucesso.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 7: Pergunta Completa - Lista de Palavras
+----------------------------------------------------
+COMANDO DE ENTRADA:
+Mostre documento com as palavras nota fiscal fornecedor ?
+
+OUTPUT ESPERADO:
+✅ Comando reconhecido com sucesso.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 8: Atribuição Válida (Regra de Resposta)
+----------------------------------------------------
+COMANDO DE ENTRADA:
+O titulo é proposta comercial final .
+
+OUTPUT ESPERADO:
+✅ Comando reconhecido com sucesso.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 9: Comando Inválido (Erro Sintático)
+----------------------------------------------------
+COMANDO DE ENTRADA:
+Meus documentos de ontem
+
+OUTPUT ESPERADO:
+❌ Erro Sintático: O comando não corresponde a nenhuma regra da gramática.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 10: Comando Incompleto (Início de Diálogo)
+----------------------------------------------------
+COMANDO DE ENTRADA:
+Existe documento com titulo ?
+
+OUTPUT ESPERADO:
+🤔 Entendi a estrutura do seu comando, mas falta uma informação.
+❓ Qual titulo você deseja?
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 11: Ciclo de Diálogo Completo (Sucesso)
+----------------------------------------------------
+ETAPA 1 - COMANDO DE ENTRADA:
+Quando foi criado o arquivo com titulo ?
+
+ETAPA 1 - OUTPUT ESPERADO:
+🤔 Entendi a estrutura do seu comando, mas falta uma informação.
+❓ Qual titulo você deseja?
+
+ETAPA 2 - COMANDO DE ENTRADA (sua resposta):
+O titulo é balanço anual .
+
+ETAPA 2 - OUTPUT ESPERADO:
+✅ Resposta recebida e processada.
+----------------------------------------------------
+
+----------------------------------------------------
+TESTE 12: Ciclo de Diálogo (Falha na Resposta)
+----------------------------------------------------
+ETAPA 1 - COMANDO DE ENTRADA:
+Qual documento está no formato ?
+
+ETAPA 1 - OUTPUT ESPERADO:
+🤔 Entendi a estrutura do seu comando, mas falta uma informação.
+❓ Qual formato você deseja?
+
+ETAPA 2 - COMANDO DE ENTRADA (sua resposta inválida):
+azul
+
+ETAPA 2 - OUTPUT ESPERADO:
+❌ Erro: Não entendi a sua resposta. Ação cancelada.
+----------------------------------------------------

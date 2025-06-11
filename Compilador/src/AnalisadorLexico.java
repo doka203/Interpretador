@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AnalisadorLexico {
     private String textoEntrada;
@@ -21,64 +21,41 @@ public class AnalisadorLexico {
     }
 
     public List<Token> analisar() {
-        List<Token> tabelaDeSimbolos = new ArrayList<>();
-
+        List<Token> tabelaDeSimbolosLexicos = new ArrayList<>();
         while (posicaoAtual < textoEntrada.length()) {
             char caractereAtual = textoEntrada.charAt(posicaoAtual);
-
             if (Character.isWhitespace(caractereAtual)) {
                 posicaoAtual++;
                 continue;
             }
-
             Token token = proximoToken();
             if (token != null) {
-                String valor = token.getValor().toLowerCase();
-
-                if (!palavrasIgnoradas.contains(valor)) {
+                if (!palavrasIgnoradas.contains(token.getValor().toLowerCase())) {
                     filaDeTokens.add(token);
-
                     if (token.getTipo() == TokenType.IDENTIFIER) {
-                        boolean palavraDuplicada = false;
-
-                        for (Token simbolo : tabelaDeSimbolos) {
-                            int distancia = similaridadeStrings(
-                                    simbolo.getValor().toLowerCase(), valor);
-                            if (distancia <= 2) {
-                                System.out.printf("Palavra possivelmente com erro (distância %d): %s ↔ %s%n",
-                                        distancia, simbolo.getValor(), valor);
-                                palavraDuplicada = true;
-                                break;
-                            }
-                        }
-
-                        if (!palavraDuplicada) {
-                            tabelaDeSimbolos.add(token);
+                        // Lógica para popular a tabela de símbolos do léxico (opcional)
+                        if (tabelaDeSimbolosLexicos.stream()
+                                .noneMatch(t -> t.getValor().equalsIgnoreCase(token.getValor()))) {
+                            tabelaDeSimbolosLexicos.add(token);
                         }
                     }
                 }
-            } else {
-                char caractereInvalido = textoEntrada.charAt(posicaoAtual);
-                throw new RuntimeException("Erro léxico: caractere inválido '" + caractereInvalido
-                        + "' (código Unicode: U+" + String.format("%04X", (int) caractereInvalido) + ")");
             }
         }
-
-        return tabelaDeSimbolos;
+        return tabelaDeSimbolosLexicos;
     }
 
     private Token proximoToken() {
-        if (posicaoAtual >= textoEntrada.length()) {
+        if (posicaoAtual >= textoEntrada.length())
             return null;
-        }
 
         class PadraoToken {
             final Pattern padrao;
             final TokenType tipo;
 
-            PadraoToken(String regex, TokenType tipo) {
-                this.padrao = Pattern.compile("^" + regex);
-                this.tipo = tipo;
+            PadraoToken(String r, TokenType t) {
+                this.padrao = Pattern.compile("^" + r, Pattern.CASE_INSENSITIVE);
+                this.tipo = t;
             }
         }
 
@@ -87,47 +64,22 @@ public class AnalisadorLexico {
                         TokenType.IDENTIFIER),
                 new PadraoToken("\\d+", TokenType.NUMBER),
                 new PadraoToken("[+\\-/*=<>!]", TokenType.OPERATOR),
-                new PadraoToken("[.,;(){}]", TokenType.SYMBOL),
+                new PadraoToken("[.,;(){}\\?]", TokenType.SYMBOL),
         };
 
         String restante = textoEntrada.substring(posicaoAtual);
-
-        for (PadraoToken padraoToken : padroes) {
-            Matcher matcher = padraoToken.padrao.matcher(restante);
-
-            if (matcher.find()) {
-                String valor = matcher.group();
+        for (PadraoToken p : padroes) {
+            Matcher m = p.padrao.matcher(restante);
+            if (m.find()) {
+                String valor = m.group();
                 posicaoAtual += valor.length();
-
-                return new Token(posicaoAtual, valor, padraoToken.tipo);
+                return new Token(posicaoAtual, valor, p.tipo);
             }
         }
 
-        String caractereInvalido = textoEntrada.substring(posicaoAtual, posicaoAtual + 1);
-        posicaoAtual += 1;
+        String caractereInvalido = restante.substring(0, 1);
+        posicaoAtual++;
         return new Token(posicaoAtual, caractereInvalido, TokenType.INVALID);
-    }
-
-    public static int similaridadeStrings(String string1, String string2) {
-        int[][] matriz = new int[string1.length() + 1][string2.length() + 1];
-
-        for (int i = 0; i <= string1.length(); i++) {
-            for (int j = 0; j <= string2.length(); j++) {
-                if (i == 0) {
-                    matriz[i][j] = j;
-                } else if (j == 0) {
-                    matriz[i][j] = i;
-                } else if (string1.charAt(i - 1) == string2.charAt(j - 1)) {
-                    matriz[i][j] = matriz[i - 1][j - 1];
-                } else {
-                    matriz[i][j] = 1 + Math.min(
-                            matriz[i - 1][j - 1],
-                            Math.min(matriz[i - 1][j], matriz[i][j - 1]));
-                }
-            }
-        }
-
-        return matriz[string1.length()][string2.length()];
     }
 
     public Queue<Token> getFilaDeTokens() {
