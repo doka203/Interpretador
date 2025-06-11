@@ -1,6 +1,5 @@
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class Main {
 
@@ -9,28 +8,35 @@ public class Main {
         AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico();
 
         while (true) {
-            System.out.println("\n------------------------------------");
-            System.out.print("Digite um comando (ou 'sair'): ");
+            System.out.println("----------------------------------------");
+            System.out.println("  0 - Sair");
+            System.out.println("  1 - Exibir tabela de símbolos");
+            System.out.println("  Digite uma pergunta");
+            System.out.println("----------------------------------------");
+            System.out.print("> ");
+
             String texto = scanner.nextLine();
 
-            if (texto.equalsIgnoreCase("sair")) {
-                System.out.println("Saindo do programa.");
+            if (texto.equals("0") || texto.equalsIgnoreCase("sair")) {
+                System.out.println("\nSaiu do Compilador.");
                 break;
-            }
-
-            if (texto.equalsIgnoreCase("tabela")) {
+            } else if (texto.equals("1") || texto.equalsIgnoreCase("tabela")) {
                 analisadorSintatico.imprimirTabelaDeSimbolos();
                 continue;
+            } else {
+                AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto);
+                analisadorLexico.analisar();
+                Queue<Token> filaDeTokens = analisadorLexico.getFilaDeTokens();
+
+                System.out.println("\n--- Fila de Tokens ---");
+                for (Token token : filaDeTokens) {
+                    System.out.print("[" + token.getValor() + "] ");
+                }
+                System.out.println();
+                System.out.println("--- Análise Sintática ---");
+                analisadorSintatico.analisar(filaDeTokens);
+                continue;
             }
-
-            AnalisadorLexico analisadorLexico = new AnalisadorLexico(texto);
-            analisadorLexico.analisar();
-            Queue<Token> filaDeTokens = analisadorLexico.getFilaDeTokens();
-
-            System.out.println("Fila de Tokens gerada: "
-                    + filaDeTokens.stream().map(Token::getValor).collect(Collectors.joining(" ")));
-
-            analisadorSintatico.analisar(filaDeTokens);
         }
 
         analisadorSintatico.imprimirTabelaDeSimbolos();
