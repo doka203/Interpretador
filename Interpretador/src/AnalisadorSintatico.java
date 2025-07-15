@@ -75,6 +75,11 @@ public class AnalisadorSintatico {
             return resultado;
         pos = savePos;
 
+        resultado = parsePerguntaPorAutor();
+        if (resultado.isSucesso())
+            return resultado;
+        pos = savePos;
+
         resultado = parsePerguntaExisteTitulo();
         if (resultado.isSucesso())
             return resultado;
@@ -104,6 +109,11 @@ public class AnalisadorSintatico {
         pos = savePos;
 
         resultado = parseRespostaOTamanhoE();
+        if (resultado.isSucesso())
+            return resultado;
+        pos = savePos;
+
+        resultado = parseRespostaAutorE();
         if (resultado.isSucesso())
             return resultado;
         pos = savePos;
@@ -195,6 +205,19 @@ public class AnalisadorSintatico {
         }
     }
 
+    // <pergunta> ::= Mostre documentos do autor <autor> ?
+    private ParseResult parsePerguntaPorAutor() {
+        if (!matchSimilar(2, "mostre", "documentos", "autor"))
+            return ParseResult.falha();
+        String autor = parseTextoLivre("?");
+        if (autor == null) {
+            return ParseResult.sucessoIncompleto("pergunta_por_autor", "autor", new HashMap<>());
+        }
+        if (!matchSimilar(2, "?"))
+            return ParseResult.falha();
+        return ParseResult.sucessoCompleto("pergunta_por_autor", Map.of("autor", autor));
+    }
+
     // <pergunta> ::= Existe documento com o titulo <titulo> ?
     private ParseResult parsePerguntaExisteTitulo() {
         if (!matchSimilar(2, "existe", "documento", "titulo"))
@@ -261,6 +284,18 @@ public class AnalisadorSintatico {
         if (tamanho == null || !matchSimilar(2, "."))
             return ParseResult.falha();
         return ParseResult.sucessoCompleto("resposta_tamanho_e", Map.of("tamanho", tamanho));
+    }
+
+    // <resposta> ::= O autor é <autor> .
+    private ParseResult parseRespostaAutorE() {
+        if (!matchSimilar(2, "autor")) {
+            return ParseResult.falha();
+        }
+        String autor = parseTextoLivre(".");
+        if (autor == null || !matchSimilar(2, ".")) {
+            return ParseResult.falha();
+        }
+        return ParseResult.sucessoCompleto("resposta_autor_e", Map.of("autor", autor));
     }
 
     // <resposta> ::= O titulo é <titulo> .
@@ -349,21 +384,6 @@ public class AnalisadorSintatico {
         return null;
     }
 
-    // private Token consume(TokenType expectedType, List<String> allowedValues) {
-    // Token token = consume(expectedType);
-    // if (token == null) {
-    // return null;
-    // }
-
-    // if (allowedValues.stream().anyMatch(val ->
-    // val.equalsIgnoreCase(token.getValor()))) {
-    // return token;
-    // } else {
-    // pos--;
-    // return null;
-    // }
-    // }
-
     private boolean matchSimilar(int distanciaMaxima, String... values) {
         int initialPos = pos;
         for (String expectedValue : values) {
@@ -413,5 +433,9 @@ public class AnalisadorSintatico {
         }
         System.out.println("----------------------------------------");
 
+    }
+
+    public List<Map<String, Object>> getTabelaDeSimbolos() {
+        return this.tabelaDeSimbolos;
     }
 }
